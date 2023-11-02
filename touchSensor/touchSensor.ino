@@ -6,8 +6,38 @@ int D1 = 4;
 int S2 = 6;
 int D2 = 7;
 
-int forward = HIGH;
-int backward = LOW;
+int forward = LOW;
+int backward = HIGH;
+
+void mForward(){
+  digitalWrite(D1, forward);
+  digitalWrite(D2, forward);
+
+  analogWrite(S1, 70);
+  analogWrite(S2, 70);
+}
+
+void mBackward(){
+  digitalWrite(D1, backward);
+  digitalWrite(D2, backward);
+
+  analogWrite(S1, 70);
+  analogWrite(S2, 70);
+}
+
+void tRight(){
+  analogWrite(S2, 0);
+  digitalWrite(D1, forward);
+  analogWrite(S1, 70);
+  delay(1000);
+}
+
+void tLeft(){
+  analogWrite(S1, 0);
+  digitalWrite(D2, forward);
+  analogWrite(S2, 70);
+  delay(1000);
+}
 
 void setup() {
   Serial.begin(9600);               // initialize serial
@@ -25,24 +55,13 @@ void loop() {
 
   if (touchState == HIGH) {
     digitalWrite(LED_PIN, LOW);
-    digitalWrite(D1, forward);
-    digitalWrite(D2, forward);
-
-    analogWrite(S1, 70);
-    analogWrite(S2, 70);
+    mForward();
   }
   else if (touchState == LOW) {
     digitalWrite(LED_PIN, HIGH);
-    digitalWrite(D1, backward);
-    digitalWrite(D2, backward);
-
-    analogWrite(S1, 70);
-    analogWrite(S2, 70);
+    mBackward();
     delay(1000);
 
-    analogWrite(S1, 0);
-    digitalWrite(D2, forward);
-    analogWrite(S2, 70);
-    delay(1000);
+    tLeft();
   }
 }
