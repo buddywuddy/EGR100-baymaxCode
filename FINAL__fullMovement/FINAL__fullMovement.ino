@@ -79,67 +79,76 @@ void touchSensor(){
   }
 }
 
-void servos(){                            //UNFINISHED
-  int delta = 50; // milliseconds delay between servo steps
-  for(pos = 0; pos < 181; pos++){
-    Serial.print("pos: ");
-    Serial.println(pos); // in steps of 1 degree
-    myservo.write(pos);
-    // tell servo to go to position in variable ‘pos’
-    delay(delta);
-    // waits for the servo to reach the position
-    }
+// void servos(){                            //UNFINISHED
+//   int delta = 50; // milliseconds delay between servo steps
+//   for(pos = 0; pos < 181; pos++){
+//     Serial.print("pos: ");
+//     Serial.println(pos); // in steps of 1 degree
+//     myservo.write(pos);
+//     // tell servo to go to position in variable ‘pos’
+//     delay(delta);
+//     // waits for the servo to reach the position
+//     }
 
-  for(pos =180; pos > 0; pos--){
-    Serial.print("pos: ");
-    Serial.println(pos);
-    myservo.write(pos);
-    delay(delta);
-  }
+//   for(pos =180; pos > 0; pos--){
+//     Serial.print("pos: ");
+//     Serial.println(pos);
+//     myservo.write(pos);
+//     delay(delta);
+//   }
 
-}
+// }
 
-void sharpSensor(int sharpPin){
-//sharp Sensor Code
-}
+// void sharpSensor(int sharpPin){
+// //sharp Sensor Code
+// }
 
 
-bool stripeSensor(){                      //UNFINISHED
-  bool inRoom = false;
-  lightVal = analogRead(stripePin);
+// bool stripeSensor(){                      //UNFINISHED
+//   bool inRoom = false;
+//   lightVal = analogRead(stripePin);
   
-  if (lightVal > threshold){
-    inRoom = true;
-  }
-  return inRoom;
-}
+//   if (lightVal > threshold){
+//     inRoom = true;
+//   }
+//   return inRoom;
+// }
 
 
-void flameSensor(){                        //UNFINISHED
-  bool flameDetected = false;
-  IRval = analogRead(flamePin);
+// void flameSensor(){                        //UNFINISHED
+//   bool flameDetected = false;
+//   IRval = analogRead(flamePin);
 
-  if(IRVal > threshold){   //threshold must be defined
-    flameDetected = true;
-  }
+//   if(IRVal > threshold){   //threshold must be defined
+//     flameDetected = true;
+//   }
 
-  if (flameDetected == false){
-    tRight(100);
+//   if (flameDetected == false){
+//     tRight(100);
 
-  } else if (flameDetected == true && IRval < threshold){
-    mForward();
-    extinguish();
-  }
+//   } else if (flameDetected == true && IRval < threshold){
+//     mForward();
+//     extinguish();
+//   }
 
-}
+// }
 
-void extinguish(){                        //UNFINISHED
-  //code that turns on extinguishing mechanism
-}
+// void extinguish(){                        //UNFINISHED
+//   //code that turns on extinguishing mechanism
+//   //once flame no longer detected, turn 180 and continue
+// }
 
+/*
+Setup Function:
+  Serial.begin
+  Set INPUT/OUTPUT pinmodes for all sensors
+  initialize servo objects
 
-
-
+Loop Function:
+  startup sequence to move robot out of start zone
+  loop the touch sensor function --> if baymax runs into a wall, back up, turn, keep moving
+  when the stripe sensor triggered, baymax has entered a room --> execute flame sequence 
+*/
 
 void setup() {
   Serial.begin(9600);
@@ -151,10 +160,10 @@ void setup() {
   pinMode(flamePin, INPUT)
   pinMode(L_sharpPin, INPUT);
   pinMode(R_sharpPin, INPUT);
+  pinMode(stripePin, INPUT);
   
   // output pins
   pinMode(servoPin,OUTPUT);
-
 
   pinMode(S1, OUTPUT);
   pinMode(D1, OUTPUT);
@@ -165,9 +174,9 @@ void setup() {
 void loop() {
   mForward();
   delay(1000);
-  
+
   touchSensor();
-  if (stripeSensor() == true){
-    flameSensor();
-  }
+  // if (stripeSensor() == true){
+  //   flameSensor();
+  // }
 }
