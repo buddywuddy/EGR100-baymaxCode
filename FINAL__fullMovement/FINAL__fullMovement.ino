@@ -163,6 +163,9 @@ void setup() {
 }
 
 void loop() {
+  mForward();
+  delay(1000);
+  
   touchSensor();
   if (stripeSensor() == true){
     flameSensor();
