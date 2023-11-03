@@ -1,14 +1,18 @@
 #include <Servo.h>;
-Servo servo
+Servo servo;
 int pos = 0;
 
 // analog ports
 int L_sharpPin = 
 int R_sharpPin =
 
-int flamePin = 
+int flamePin =
+int IRval; 
 
-int servoPin = 9
+int servoPin = 9;
+
+int stripePin =
+int lightVal;
 
 // digital ports
 int touchPin  = 8;
@@ -19,36 +23,63 @@ int D1 = 4;
 int S2 = 6;
 int D2 = 7;
 
-int forward = HIGH;
-int backward = LOW;
+int forward = LOW;
+int backward = HIGH;
+
+void mForward(){
+  digitalWrite(D1, forward);
+  digitalWrite(D2, forward);
+
+  analogWrite(S1, 70);
+  analogWrite(S2, 70);
+}
+
+void mBackward(){
+  digitalWrite(D1, backward);
+  digitalWrite(D2, backward);
+
+  analogWrite(S1, 70);
+  analogWrite(S2, 70);
+}
+
+void tRight(int time){
+  analogWrite(S2, 0);
+  digitalWrite(D1, forward);
+  analogWrite(S1, 70);
+  delay(time);
+}
+
+void tLeft(int time){
+  analogWrite(S1, 0);
+  digitalWrite(D2, forward);
+  analogWrite(S2, 70);
+  delay(time);
+}
 
 // function for the touch sensor
 void touchSensor(){
-  int touchState = digitalRead(touchPin); // read new state
+  int touchState = digitalRead(TOUCH_SENSOR_PIN); // read new state
 
-  if (touchState == HIGH) {                       // if touch sensor not triggered, move forward at 70 speed
-    digitalWrite(D1, forward);
-    digitalWrite(D2, forward);
-
-    analogWrite(S1, 70);
-    analogWrite(S2, 70);
+  if (touchState == HIGH) {
+    digitalWrite(LED_PIN, LOW);
+    mForward();
   }
-  else if (touchState == LOW) {                   // if touch sensor triggered, move backward, then pivot 90 degrees
-    digitalWrite(D1, backward);
-    digitalWrite(D2, backward);
-
-    analogWrite(S1, 70);
-    analogWrite(S2, 70);
+  else if (touchState == LOW && sharpSensor(L_SharpPin) == HIGH) {
+    digitalWrite(LED_PIN, HIGH);
+    mBackward();
     delay(1000);
 
-    analogWrite(S1, 0);
-    digitalWrite(D2, forward);
-    analogWrite(S2, 70);
+    tRight();
+  }else if (touchState == LOW && sharpSensor(R_SharpPin) == HIGH) {
+    digitalWrite(LED_PIN, HIGH);
+    mBackward();
     delay(1000);
+
+    tLeft();
   }
 }
 
-void servos(){
+void servos(){                            //UNFINISHED
   int delta = 50; // milliseconds delay between servo steps
   for(pos = 0; pos < 181; pos++){
     Serial.print("pos: ");
@@ -68,9 +99,47 @@ void servos(){
 
 }
 
-void sharpSensor(){
+void sharpSensor(int sharpPin){
+//sharp Sensor Code
+}
+
+
+bool stripeSensor(){                      //UNFINISHED
+  bool inRoom = false;
+  lightVal = analogRead(stripePin);
+  
+  if (lightVal > threshold){
+    inRoom = true;
+  }
+  return inRoom;
+}
+
+
+void flameSensor(){                        //UNFINISHED
+  bool flameDetected = false;
+  IRval = analogRead(flamePin);
+
+  if(IRVal > threshold){   //threshold must be defined
+    flameDetected = true;
+  }
+
+  if (flameDetected == false){
+    tRight(100);
+
+  } else if (flameDetected == true && IRval < threshold){
+    mForward();
+    extinguish();
+  }
 
 }
+
+void extinguish(){                        //UNFINISHED
+  //code that turns on extinguishing mechanism
+}
+
+
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -95,4 +164,7 @@ void setup() {
 
 void loop() {
   touchSensor();
+  if (stripeSensor() == true){
+    flameSensor();
+  }
 }
