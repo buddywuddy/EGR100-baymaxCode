@@ -13,30 +13,30 @@ void mForward(){
   digitalWrite(D1, forward);
   digitalWrite(D2, forward);
 
-  analogWrite(S1, 70);
-  analogWrite(S2, 70);
+  analogWrite(S1, 150);
+  analogWrite(S2, 150);
 }
 
 void mBackward(){
   digitalWrite(D1, backward);
   digitalWrite(D2, backward);
 
-  analogWrite(S1, 70);
-  analogWrite(S2, 70);
+  analogWrite(S1, 150);
+  analogWrite(S2, 150);
 }
 
-void tRight(){
+void tRight(int time){
   analogWrite(S2, 0);
   digitalWrite(D1, forward);
-  analogWrite(S1, 70);
-  delay(1000);
+  analogWrite(S1, 150);
+  delay(time);
 }
 
-void tLeft(){
+void tLeft(int time){
   analogWrite(S1, 0);
   digitalWrite(D2, forward);
-  analogWrite(S2, 70);
-  delay(1000);
+  analogWrite(S2, 150);
+  delay(time);
 }
 
 void setup() {
@@ -62,6 +62,6 @@ void loop() {
     mBackward();
     delay(1000);
 
-    tLeft();
+    tLeft(500);
   }
 }

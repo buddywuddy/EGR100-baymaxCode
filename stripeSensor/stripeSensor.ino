@@ -15,29 +15,29 @@ void mForward() {  // move forward
   digitalWrite(D1, forward);
   digitalWrite(D2, forward);
 
-  analogWrite(S1, 70);
-  analogWrite(S2, 70);
+  analogWrite(S1, 150);
+  analogWrite(S2, 150);
 }
 
 void mBackward() {  // move backwards
   digitalWrite(D1, backward);
   digitalWrite(D2, backward);
 
-  analogWrite(S1, 70);
-  analogWrite(S2, 70);
+  analogWrite(S1, 150);
+  analogWrite(S2, 150);
 }
 
 void tRight(int time) {  // turn right
   analogWrite(S2, 0);
   digitalWrite(D1, forward);
-  analogWrite(S1, 70);
+  analogWrite(S1, 150);
   delay(time);
 }
 
 void tLeft(int time) {  // turn left
   analogWrite(S1, 0);
   digitalWrite(D2, forward);
-  analogWrite(S2, 70);
+  analogWrite(S2, 150);
   delay(time);
 }
 
@@ -52,7 +52,6 @@ void setup(void) {
   pinMode(S2, OUTPUT);
   pinMode(D2, OUTPUT);
 
-  analogWrite(photocellPin, HIGH);
 }
 
 void loop(void) {
@@ -63,7 +62,7 @@ void loop(void) {
 
   } else if (lightVal < 500 && turned == false) {
     turned = !turned;
-    tLeft(500);
+    tLeft(250);
     mForward();
     delay(500);
 
@@ -72,7 +71,7 @@ void loop(void) {
 
   } else if (lightVal < 500 && turned == true) {
     turned = !turned;
-    tRight(500);
+    tRight(250);
     mForward();
     delay(500);
 
