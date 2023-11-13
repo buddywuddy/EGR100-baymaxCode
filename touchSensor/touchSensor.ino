@@ -60,7 +60,7 @@ void loop() {
   else if (touchState == LOW) {
     digitalWrite(LED_PIN, HIGH);
     mBackward();
-    delay(1000);
+    delay(500);
 
     tLeft(500);
   }
