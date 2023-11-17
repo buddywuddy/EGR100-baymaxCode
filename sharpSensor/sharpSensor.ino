@@ -12,6 +12,9 @@ int D2 = 7;
 int forward = LOW;
 int backward = HIGH;
 
+// Define threshold distance for wall following
+int thresholdDistance = 200;
+
 // movement functions
 void stop() {
   analogWrite(S1, 0);
@@ -50,11 +53,6 @@ void tLeft(int speed, int time) {
   delay(time);
 }
 
-// Define threshold distances for wall following
-const int wallThresholdLeft = 200;  // Adjust this value based on sensor readings
-const int wallThresholdRight = 200; // Adjust this value based on sensor readings
-
-
 void setup() {
   pinMode(L_sharpPin, INPUT);
   pinMode(R_sharpPin, INPUT);
@@ -68,26 +66,26 @@ void setup() {
 }
 
 void loop() {
-  // Read sensor values
-  int leftSensorValue = analogRead(L_sharpPin);
-  int rightSensorValue = analogRead(R_sharpPin);
+  // Read distance from the two Sharp sensors
+  int distanceL = analogRead(L_sharpPin);
+  int distanceR = analogRead(R_sharpPin);
 
-  // Check left sensor for wall
-  if (leftSensorValue > wallThresholdLeft) {
-    // Wall on the left, turn right
+  // Check if the robot is too close to the wall
+  if (distanceL < thresholdDistance && distanceR < thresholdDistance) {
+    // Turn right
     tRight(150, 500);
-  } else {
-    // No wall on the left, move forward
+  } else if (distanceL > thresholdDistance && distanceR > thresholdDistance) {
+    // Move forward
     mForward(150, 100);
-  }
-
-  // Check right sensor for wall
-  if (rightSensorValue > wallThresholdRight) {
-    // Wall on the right, turn left
-    tLeft(150, 500);
   } else {
-    // No wall on the right, move forward
-    mForward(150, 100);
+    // Adjust the robot's path
+    if (distanceL < distanceR) {
+      // Turn right
+      tRight(150, 500);
+    } else {
+      // Move forward
+      mForward(150, 100);
+    }
   }
 
   int touchState = digitalRead(TOUCH_SENSOR_PIN); // read new state
@@ -100,13 +98,13 @@ void loop() {
     digitalWrite(LED_PIN, HIGH);
     mBackward(150, 100);
 
-    if (leftSensorValue > wallThresholdLeft) {
+    if (distanceL > thresholdDistance) {
       // Wall on the left, turn right
       tRight(150, 500);
     }
 
   // Check right sensor for wall
-    if (rightSensorValue > wallThresholdRight) {
+    if (distanceR > thresholdDistance) {
       // Wall on the right, turn left
       tLeft(150, 500);
     }
