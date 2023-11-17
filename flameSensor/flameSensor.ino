@@ -1,7 +1,8 @@
-int flamePin = 4;
-int IRval;
-int L_IR;
-int R_IR;
+int L_flamePin = 0;
+int R_flamePin = 1;
+
+const int TOUCH_SENSOR_PIN  = 8; // Arduino pin connected to the OUTPUT pin of touch sensor
+const int LED_PIN           = 13; // Arduino pin connected to LED's pin
 
 int S1 = 5;
 int D1 = 4;
@@ -12,13 +13,12 @@ int forward = LOW;
 int backward = HIGH;
 
 // movement functions
-void stop(int time){                      // force stop
+void stop() {
   analogWrite(S1, 0);
   analogWrite(S2, 0);
-  delay(time);
 }
 
-void mForward(int speed, int time) {                 // move forward
+void mForward(int speed, int time) {
   digitalWrite(D1, forward);
   digitalWrite(D2, forward);
 
@@ -27,7 +27,7 @@ void mForward(int speed, int time) {                 // move forward
   delay(time);
 }
 
-void mBackward(int speed, int time) {                // move backwards
+void mBackward(int speed, int time) {
   digitalWrite(D1, backward);
   digitalWrite(D2, backward);
 
@@ -36,64 +36,78 @@ void mBackward(int speed, int time) {                // move backwards
   delay(time);
 }
 
-void tRight(int speed,int time) {           // turn right
+void tRight(int speed, int time) {
   analogWrite(S2, 0);
   digitalWrite(D1, forward);
   analogWrite(S1, speed);
   delay(time);
 }
 
-void tLeft(int speed, int time) {            // turn left
+void tLeft(int speed, int time) {
   analogWrite(S1, 0);
   digitalWrite(D2, forward);
   analogWrite(S2, speed);
   delay(time);
 }
 
+const int threshold = 400; // Adjust this value based on sensor readings
 
-// setup and loop funtions -----------------------------------------------
-void setup(void) {
-  Serial.begin(9600);
-  pinMode(flamePin, INPUT);
+
+void setup() {
+  pinMode(L_flamePin, INPUT);
+  pinMode(R_flamePin, INPUT);
 
   pinMode(S1, OUTPUT);
   pinMode(D1, OUTPUT);
   pinMode(S2, OUTPUT);
   pinMode(D2, OUTPUT);
+
+  Serial.begin(9600);
 }
 
-void loop() {           //range flame detetcted: 650 - 0
-  IRval = analogRead(flamePin);
+void loop() {
+  // Read sensor values
+  int L_IRVal = analogRead(L_flamePin);
+  int R_IRVal = analogRead(R_flamePin);
 
-  if(IRval < 300){
-    stop(1000);
+  // Check left sensor for wall
+  if (L_IRVal > threshold) {
+    // Wall on the left, turn right
+    tRight(150, 100);
+  } else {
+    // No wall on the left, move forward
+    mForward(150, 100);
+  }
 
+  // Check right sensor for wall
+  if (R_IRVal > threshold) {
+    // Wall on the right, turn left
+    tLeft(150, 100);
+  } else {
+    // No wall on the right, move forward
+    mForward(150, 100);
+  }
 
-  }else if(IRval < 400){
-    mForward(50, 100);
+  int touchState = digitalRead(TOUCH_SENSOR_PIN); // read new state
 
-  }else if(IRval < 600){
-    stop(500);
+  if (touchState == HIGH) {
+    digitalWrite(LED_PIN, LOW);
+    mForward(150, 100);
+  }
+  else if (touchState == LOW) {
+    digitalWrite(LED_PIN, HIGH);
+    mBackward(150, 100);
 
-    tLeft(50, 50);
-    stop(500);
-    L_IR = analogRead(flamePin);
-
-    tRight(70, 100);
-    stop(500);
-    R_IR = analogRead(flamePin);
-
-    tLeft(50, 50);
-
-    if(L_IR > R_IR){
-      tLeft(50, 50);
-    }else if(R_IR > L_IR){
-      tRight(50, 50);
+    if (L_IRVal > threshold) {
+      // Wall on the left, turn right
+      tRight(150, 100);
     }
 
-  }else{
-    mForward(70, 100);
-
+  // Check right sensor for wall
+    if (R_IRVal > threshold) {
+      // Wall on the right, turn left
+      tLeft(150, 100);
+    }
 
   }
 }
