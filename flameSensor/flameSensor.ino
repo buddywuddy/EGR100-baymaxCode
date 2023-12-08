@@ -1,8 +1,8 @@
 int L_flamePin = 0;
 int R_flamePin = 1;
 
-const int TOUCH_SENSOR_PIN  = 8; // Arduino pin connected to the OUTPUT pin of touch sensor
-const int LED_PIN           = 13; // Arduino pin connected to LED's pin
+const int TOUCH_SENSOR_PIN = 8;  // Arduino pin connected to the OUTPUT pin of touch sensor
+const int LED_PIN = 13;          // Arduino pin connected to LED's pin
 
 int S1 = 5;
 int D1 = 4;
@@ -50,7 +50,7 @@ void tLeft(int speed, int time) {
   delay(time);
 }
 
-const int threshold = 400; // Adjust this value based on sensor readings
+const int threshold = 400;  // Adjust this value based on sensor readings
 
 
 void setup() {
@@ -88,13 +88,12 @@ void loop() {
     mForward(150, 100);
   }
 
-  int touchState = digitalRead(TOUCH_SENSOR_PIN); // read new state
+  int touchState = digitalRead(TOUCH_SENSOR_PIN);  // read new state
 
   if (touchState == HIGH) {
     digitalWrite(LED_PIN, LOW);
     mForward(150, 100);
-  }
-  else if (touchState == LOW) {
+  } else if (touchState == LOW) {
     digitalWrite(LED_PIN, HIGH);
     mBackward(150, 100);
 
@@ -103,11 +102,10 @@ void loop() {
       tRight(150, 100);
     }
 
-  // Check right sensor for wall
+    // Check right sensor for wall
     if (R_IRVal > threshold) {
       // Wall on the right, turn left
       tLeft(150, 100);
     }
-
   }
 }
