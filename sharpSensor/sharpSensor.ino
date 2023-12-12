@@ -1,4 +1,6 @@
 #include <Servo.h>
+int dir;
+int opposite;
 
 // ANALOG PORTS
 int movedBack = 0;
@@ -95,46 +97,48 @@ void touch(){
   }
 }
 
-void rightWallFollowing(){
-  distanceR = analogRead(L_sharpPin);
-  if (distanceR < farThreshold){
-    tRight(175);
-    delay(100);
-  } else {
-    mForward(175);
-  }
 
-  // Check left sensor for wall
-  if (distanceR > closeThreshold) {
-    // Wall on the left, turn right
-    tLeft(175);
-    delay(100);
-  } else {
-    // No wall on the left, move forward
-    mForward(175);
-  }
-  touch();
-}
+void wallFollowing(int direction){
+  if (direction == 0){
+    distanceL = analogRead(R_sharpPin);
+    if (distanceL < 125){
+      tLeft(175);
+      delay(100);
+   } else {
+     mForward(175);
+    }
 
-void leftWallFollowing(){
-  distanceL = analogRead(R_sharpPin);
-  if (distanceL < 125){
-    tLeft(175);
-    delay(100);
-  } else {
-    mForward(175);
-  }
+    // Check left sensor for wall
+    if (distanceL > 185) {
+      // Wall on the left, turn right
+      tRight(175);
+      delay(100);
+    } else {
+     // No wall on the left, move forward
+     mForward(175);
+    }
+    touch();
 
-  // Check left sensor for wall
-  if (distanceL > 185) {
-    // Wall on the left, turn right
-    tRight(175);
-    delay(100);
-  } else {
-    // No wall on the left, move forward
-    mForward(175);
+  } else if (direction == 1){
+    distanceR = analogRead(L_sharpPin);
+    if (distanceR < farThreshold){
+      tRight(175);
+      delay(100);
+    } else {
+      mForward(175);
+    }
+
+    // Check left sensor for wall
+    if (distanceR > closeThreshold) {
+      // Wall on the left, turn right
+      tLeft(175);
+      delay(100);
+    } else {
+      // No wall on the left, move forward
+      mForward(175);
+    }
+    touch();
   }
-  touch();
 }
 
 void stripe(){
@@ -224,21 +228,30 @@ void setup() {
 
   Serial.begin(9600);
 
-  mForward(100);
-  delay(1000);
+  distanceR = analogRead(L_sharpPin);
+  distanceL = analogRead(R_sharpPin);
 
-  if (distanceR < distanceL){
-    start = "right";
-  } else if (distanceL < distanceR){
-    start = "left";
+  if (distanceR > closeThreshold){
+    dir = 1;
+    opposite = 0;
+  } else if (distanceL > 185 ){
+    dir = 0;
+    opposite = 1;
   }
+
+  mForward(150);
+  delay(500);
 
 }
 
+
 void loop() {
-  if (distanceR < distanceL
   stripe();
-  rightWallFollowing();
+  wallFollowing(dir);
+
+  if(stripeCount != 0){
+    wallFollowing(opposite);
+  }
 
   flame();
 }
