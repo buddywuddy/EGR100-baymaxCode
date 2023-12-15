@@ -1,6 +1,6 @@
 #include <Servo.h>
-int dir;
-int opposite;
+int dir = 1;
+int opposite = 0;
 bool runOnce = false;
 int speed = 150;
 bool turned = false;
@@ -13,8 +13,8 @@ int distanceL = analogRead(R_sharpPin);
 int L_sharpPin = 1;
 int distanceR = analogRead(L_sharpPin);
 
-const int closeThreshold = 200;
-const int farThreshold = 125;
+const int closeThreshold = 225;
+const int farThreshold = 200;
 
 int B_stripePin = 5;
 int B_stripeReading = analogRead(B_stripePin)*4;
@@ -33,8 +33,8 @@ int R_flamePin = 4;
 int rFlame = analogRead(R_flamePin);
 int L_flamePin = 3;
 int lFlame = analogRead(L_flamePin);
-int flameThreshold = 1000;
-int fireThreshold = 985;
+int flameThreshold = 990;
+int fireThreshold = 800;
 
 
 Servo motorServo;
@@ -216,19 +216,25 @@ void flame(){
   lFlame = analogRead(L_flamePin);
   rFlame = analogRead(R_flamePin);
 
-  if (lFlame < flameThreshold || rFlame < flameThreshold){
+if (lFlame < 965 || rFlame < 975){
+    mForward(35);
+    stop();
     digitalWrite(fanPin, HIGH);
+    servoTurn();
     if (lFlame < rFlame){
-      tLeft(75);
+      tLeft(100);
+      if (lFlame < 935 && rFlame < 965){
+        stop();
+        servoTurn();
+      }
     } else if (rFlame < lFlame){
-      tRight(75);
+      tRight(100);
+      if (lFlame < 935 && rFlame < 965){
+        stop();
+        servoTurn();
+      }
     }
-
-    if (lFlame < fireThreshold && rFlame < fireThreshold){
-      stop();
-      servoTurn();
-      delay(1000);
-    }
+    delay(2000);
   }
   
   // if (lFlame < flameThreshold){
@@ -298,6 +304,7 @@ void setup() {
 void loop() {
   // wallFollowing(dir); //start wall following based on the position at the start
   stripe();
+  flame();
 
   if (circleCount == 0){
     wallFollowing(dir);
@@ -325,8 +332,5 @@ void loop() {
       runOnce = true;
     }
     wallFollowing(opposite); //when the circle has been passed, start wall following in the opposite direction
-
   }
-
-  flame();
 }
